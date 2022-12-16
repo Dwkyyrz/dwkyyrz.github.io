@@ -6,14 +6,48 @@ $password = md5($_POST['password']);
 
 $login = mysqli_query($koneksi, "SELECT * from user where username='$username' and password='$password'");
 $cek = mysqli_num_rows($login);
+$user = mysqli_fetch_array($login);
 
-if ($cek > 0) {
+$admin = mysqli_query($koneksi, "SELECT * FROM user WHERE username='$username' AND password='$password' AND rule='admin'");
+$adm_cek = mysqli_num_rows($admin);
+$adm = mysqli_fetch_array($admin);
+
+if ($adm_cek > 0) {
   session_start();
+  $_SESSION['id'] = $adm['id'];
   $_SESSION['username'] = $username;
   $_SESSION['status'] = "login";
-  header("location:tes.php");
+  $_SESSION['rule'] = "admin";
+  header("location:../Website/admin/dashboard/dashboard.php");
+}
+else if ($cek > 0) {
+  session_start();
+  $_SESSION['id'] = $user['id'];
+  $_SESSION['username'] = $username;
+  $_SESSION['status'] = "login";
+  $_SESSION['rule'] = "user";
+  header("location:index.php");
+}
+else if ($username=="" && $password== md5("")) {
+  echo "<script> 
+  alert('Login gagal! Pastikan Username dan Password tidak kosong')
+  window.location = 'registrasi.html' </script>";
+}
+else if ($username=="") {
+  echo "<script> 
+  alert('Login gagal! Pastikan Username tidak kosong')
+  window.location = 'registrasi.html' </script>";
+}
+else if ($password== md5("")) {
+  echo "<script> 
+  alert('Login gagal! Pastikan Password tidak kosong')
+  window.location = 'registrasi.html' </script>";
 }
 else {
-  header("location:registrasi.html");
+  echo "<script> 
+            alert('Login gagal! Pastikan Username dan Password benar!')
+            window.location = 'registrasi.html' 
+        </script>";
+  // header("location:registrasi.html");
 }
 ?>
